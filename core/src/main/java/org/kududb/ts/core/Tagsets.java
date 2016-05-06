@@ -198,8 +198,20 @@ class Tagsets {
         return MoreObjects.toStringHelper(this).toString();
       }
     }
+    final class LookupErrback implements Callback<Exception, Exception> {
+      @Override
+      public Exception call(Exception e) throws Exception {
+        tagsets.invalidate(tagset);
+        return e;
+      }
+      @Override
+      public String toString() {
+        return MoreObjects.toStringHelper(this).toString();
+      }
+    }
 
-    return lookupTagset(tagset, id).addCallbackDeferring(new LookupCB());
+    return lookupTagset(tagset, id).addCallbackDeferring(new LookupCB())
+                                   .addErrback(new LookupErrback());
   }
 
   private Deferred<TagsetLookupResult> lookupTagset(SerializedTagset tagset, int id) {
