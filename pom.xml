@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.kududb</groupId>
+  <artifactId>kudu-ts</artifactId>
+  <name>Kudu TS</name>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <!-- Platform encoding override -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Maven plugins -->
+    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+    <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+    <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+    <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+    <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+
+    <!-- Library dependencies -->
+    <commons-io.version>2.4</commons-io.version>
+    <guava.version>18.0</guava.version>
+    <jsr305.version>3.0.1</jsr305.version>
+    <junit.version>4.11</junit.version>
+    <kudu.version>0.9.0-SNAPSHOT</kudu.version>
+    <log4j.version>1.2.17</log4j.version>
+    <slf4j.version>1.7.21</slf4j.version>
+
+    <!-- Kudu test minicluster configuration-->
+    <binDir>../kudu/build/latest/bin</binDir>
+
+    <!-- Misc variables -->
+    <testdata.dir>target/testdata</testdata.dir>
+  </properties>
+
+  <modules>
+    <module>core</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kududb</groupId>
+        <artifactId>kudu-client</artifactId>
+        <version>${kudu.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kududb</groupId>
+        <artifactId>interface-annotations</artifactId>
+        <version>${kudu.version}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>${jsr305.version}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kududb</groupId>
+        <artifactId>kudu-client</artifactId>
+        <version>${kudu.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>1.7</source>
+            <target>1.7</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${maven-antrun-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>test-compile</phase>
+              <configuration>
+                <target>
+                  <delete dir="${testdata.dir}"/>
+                  <mkdir dir="${testdata.dir}"/>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <configuration>
+            <maxmemory>2048m</maxmemory>
+            <notimestamp>true</notimestamp>
+            <doclet>org.kududb.annotations.tools.IncludePublicAnnotationsStandardDoclet</doclet>
+            <docletArtifact>
+              <groupId>org.kududb</groupId>
+              <artifactId>interface-annotations</artifactId>
+              <version>${kudu.version}</version>
+            </docletArtifact>
+            <name>Kudu TS API</name>
+            <description>The Kudu TS API</description>
+            <includeDependencySources>false</includeDependencySources>
+            <dependencySourceIncludes>
+              <dependencySourceInclude>org.kududb:interface-annotations</dependencySourceInclude>
+              <dependencySourceInclude>org.kududb:client</dependencySourceInclude>
+            </dependencySourceIncludes>
+          </configuration>
+        </plugin>
+
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <reuseForks>false</reuseForks>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

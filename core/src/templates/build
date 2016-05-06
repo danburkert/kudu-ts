@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+sed -e 's/{Type}/Integer/g;s/{ShortType}/Int/g;s/{Primitive}/int/g' "$DIR/Vec.java" > "$DIR/../main/java/org/kududb/ts/core/IntVec.java"
+sed -e 's/{Type}/Long/g;s/{ShortType}/Long/g;s/{Primitive}/long/g' "$DIR/Vec.java" > "$DIR/../main/java/org/kududb/ts/core/LongVec.java"
+sed -e 's/{Type}/Double/g;s/{ShortType}/Double/g;s/{Primitive}/double/g' "$DIR/Vec.java" > "$DIR/../main/java/org/kududb/ts/core/DoubleVec.java"
+
+sed -e 's/{Type}/Integer/g;s/{ShortType}/Int/g;s/{Primitive}/int/g' "$DIR/TestVec.java" > "$DIR/../test/java/org/kududb/ts/core/TestIntVec.java"
+sed -e 's/{Type}/Long/g;s/{ShortType}/Long/g;s/{Primitive}/long/g' "$DIR/TestVec.java" > "$DIR/../test/java/org/kududb/ts/core/TestLongVec.java"
+sed -e 's/{Type}/Double/g;s/{ShortType}/Double/g;s/{Primitive}/double/g' "$DIR/TestVec.java" > "$DIR/../test/java/org/kududb/ts/core/TestDoubleVec.java"
