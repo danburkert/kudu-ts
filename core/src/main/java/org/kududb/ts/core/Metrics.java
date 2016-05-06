@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.kududb.annotations.InterfaceAudience;
+import org.kududb.client.AbstractionBulldozer;
 import org.kududb.client.AsyncKuduClient;
 import org.kududb.client.AsyncKuduScanner;
 import org.kududb.client.Insert;
@@ -76,13 +77,13 @@ public class Metrics {
         KuduPredicate.newComparisonPredicate(Tables.METRICS_TIME_COLUMN,
                                              KuduPredicate.ComparisonOp.LESS, endTime);
 
-    final AsyncKuduScanner scanner = client.newScannerBuilder(table)
-                                           .addPredicate(metricPred)
-                                           .addPredicate(tagsetIdPred)
-                                           .addPredicate(startTimestampPred)
-                                           .addPredicate(endTimestampPred)
-                                           .setProjectedColumnIndexes(TIME_VALUE_PROJECTION)
-                                           .build();
+    final AsyncKuduScanner scanner = AbstractionBulldozer.sortResultsByPrimaryKey(
+        client.newScannerBuilder(table)
+              .addPredicate(metricPred)
+              .addPredicate(tagsetIdPred)
+              .addPredicate(startTimestampPred)
+              .addPredicate(endTimestampPred)
+              .setProjectedColumnIndexes(TIME_VALUE_PROJECTION)).build();
 
     class SeriesScanCB implements Callback<Deferred<Datapoints>, RowResultIterator> {
       private final LongVec times = LongVec.create();
