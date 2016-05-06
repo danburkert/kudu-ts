@@ -8,6 +8,7 @@
   <name>Kudu TS</name>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <url>http://github.com/danburkert/kudu-ts</url>
 
   <properties>
     <!-- Platform encoding override -->
@@ -146,30 +147,6 @@
             </execution>
           </executions>
         </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <configuration>
-            <maxmemory>2048m</maxmemory>
-            <notimestamp>true</notimestamp>
-            <doclet>org.kududb.annotations.tools.IncludePublicAnnotationsStandardDoclet</doclet>
-            <docletArtifact>
-              <groupId>org.kududb</groupId>
-              <artifactId>interface-annotations</artifactId>
-              <version>${kudu.version}</version>
-            </docletArtifact>
-            <name>Kudu TS API</name>
-            <description>The Kudu TS API</description>
-            <includeDependencySources>false</includeDependencySources>
-            <dependencySourceIncludes>
-              <dependencySourceInclude>org.kududb:interface-annotations</dependencySourceInclude>
-              <dependencySourceInclude>org.kududb:client</dependencySourceInclude>
-            </dependencySourceIncludes>
-          </configuration>
-        </plugin>
-
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
