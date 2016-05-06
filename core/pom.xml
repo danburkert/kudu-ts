@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.kududb</groupId>
+    <groupId>org.kududb.ts</groupId>
     <artifactId>kudu-ts</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
