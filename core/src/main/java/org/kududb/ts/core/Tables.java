@@ -30,25 +30,55 @@ class Tables {
   static final int TAGS_TAGSET_ID_INDEX = 2;
 
   static final ColumnSchema METRICS_METRIC_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("metric", Type.STRING).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("metric", Type.STRING)
+                      .nullable(false)
+                      .key(true)
+                      .encoding(ColumnSchema.Encoding.DICT_ENCODING).build();
   static final ColumnSchema METRICS_TAGSET_ID_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("tagset_id", Type.INT32).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("tagset_id", Type.INT32)
+          .nullable(false)
+          .key(true)
+          .compressionAlgorithm(ColumnSchema.CompressionAlgorithm.LZ4)
+                                                                   .build();
   static final ColumnSchema METRICS_TIME_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP)
+                      .nullable(false)
+                      .key(true)
+                      .encoding(ColumnSchema.Encoding.BIT_SHUFFLE)
+                      .build();
   static final ColumnSchema METRICS_VALUE_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("value", Type.DOUBLE).nullable(false).build();
+      new ColumnSchema.ColumnSchemaBuilder("value", Type.DOUBLE)
+                      .nullable(false)
+                      .encoding(ColumnSchema.Encoding.BIT_SHUFFLE)
+                      .build();
 
   static final ColumnSchema TAGSETS_ID_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("id", Type.INT32).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("id", Type.INT32)
+                      .nullable(false)
+                      .key(true).build();
   static final ColumnSchema TAGSETS_TAGSET_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("tagset", Type.BINARY).nullable(false).build();
+      new ColumnSchema.ColumnSchemaBuilder("tagset", Type.BINARY)
+                      .nullable(false)
+                      .compressionAlgorithm(ColumnSchema.CompressionAlgorithm.LZ4)
+                      .build();
 
   static final ColumnSchema TAGS_KEY_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("key", Type.STRING).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("key", Type.STRING)
+                      .nullable(false)
+                      .key(true)
+                      .encoding(ColumnSchema.Encoding.DICT_ENCODING)
+                      .build();
   static final ColumnSchema TAGS_VALUE_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("value", Type.STRING).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("value", Type.STRING)
+                      .nullable(false)
+                      .key(true)
+                      .encoding(ColumnSchema.Encoding.DICT_ENCODING)
+                      .build();
   static final ColumnSchema TAGS_TAGSET_ID_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("tagset_id", Type.INT32).nullable(false).key(true).build();
+      new ColumnSchema.ColumnSchemaBuilder("tagset_id", Type.INT32)
+                      .nullable(false)
+                      .key(true)
+                      .build();
 
   static final Schema METRICS_SCHEMA = new Schema(ImmutableList.of(METRICS_METRIC_COLUMN,
                                                                    METRICS_TAGSET_ID_COLUMN,
