@@ -1,0 +1,22 @@
+sudo: required
+dist: trusty
+language: java
+
+before_install:
+  - curl http://archive.cloudera.com/beta/kudu/ubuntu/trusty/amd64/kudu/archive.key | sudo apt-key add -
+  - echo "deb [arch=amd64] http://archive.cloudera.com/beta/kudu/ubuntu/trusty/amd64/kudu trusty-kudu0 contrib" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -y kudu kudu-master kudu-tserver
+  # TODO: remove below once 0.9 is released
+  - sudo apt-get install -y build-essential
+  - wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
+  - tar -xzvf protobuf-2.6.1.tar.gz
+  - pushd protobuf-2.6.1
+  - ./configure --prefix=${PWD}/build
+  - make install
+  - ls build/bin
+  - popd
+  - git clone https://github.com/apache/incubator-kudu
+  - pushd incubator-kudu/java
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -DprotocExecutable=../../protobuf-2.6.1/build/bin/protoc
+  - popd
