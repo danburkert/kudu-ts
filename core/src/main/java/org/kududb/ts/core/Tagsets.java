@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.kududb.annotations.InterfaceAudience;
+import org.kududb.client.AbstractionBulldozer;
 import org.kududb.client.AsyncKuduClient;
 import org.kududb.client.AsyncKuduScanner;
 import org.kududb.client.AsyncKuduSession;
@@ -240,6 +241,7 @@ class Tagsets {
                                                                     id + TAGSETS_PER_SCAN));
     }
     scanBuilder.setProjectedColumnIndexes(columnIndexes);
+    AbstractionBulldozer.sortResultsByPrimaryKey(scanBuilder);
     return scanBuilder.build();
   }
 
