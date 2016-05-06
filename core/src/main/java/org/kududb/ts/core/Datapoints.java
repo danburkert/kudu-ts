@@ -38,7 +38,7 @@ public class Datapoints implements Iterable<Datapoint> {
   /**
    * Returns the name of the metric.
    */
-  String getMetric() {
+  public String getMetric() {
     return metric;
   }
 
@@ -56,7 +56,7 @@ public class Datapoints implements Iterable<Datapoint> {
    * @param index of the {@code Datapoint} whose time to return
    * @return the time of the {@code Datapoint} at the provided index
    */
-  long getTime(int index) {
+  public long getTime(int index) {
     return times.get(index);
   }
 
@@ -65,14 +65,14 @@ public class Datapoints implements Iterable<Datapoint> {
    * @param index of the {@code Datapoint} whose value to return
    * @return the value of the {@code Datapoint} at the provided index
    */
-  double getValue(int index) {
+  public double getValue(int index) {
     return values.get(index);
   }
 
   /**
    * Returns the number of data points.
    */
-  int size() {
+  public int size() {
     return times.len();
   }
 
