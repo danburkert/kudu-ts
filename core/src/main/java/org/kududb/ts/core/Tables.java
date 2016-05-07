@@ -169,7 +169,7 @@ class Tables {
     CreateTableOptions create = new CreateTableOptions();
     create.setNumReplicas(options.getNumReplicas());
     create.addHashPartitions(ImmutableList.of("key", "value"),
-                             options.getNumTagsetsTablets(numTabletServers));
+                             options.getNumTagsTablets(numTabletServers));
     create.setRangePartitionColumns(ImmutableList.<String>of());
     return create;
   }

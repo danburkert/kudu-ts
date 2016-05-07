@@ -25,7 +25,7 @@ public class CreateOptions {
 
   private List<Long> metricsSplits = ImmutableList.of();
 
-  private int numReplicas = 3;
+  private int numReplicas = 1;
 
   private CreateOptions() {}
 
@@ -33,7 +33,7 @@ public class CreateOptions {
    * Returns the default create options:
    *
    * <ul>
-   *   <li>numReplicas: 3</li>
+   *   <li>numReplicas: 1</li>
    *   <li>tags: 1 tablet per tablet server</li>
    *   <li>tagsets: 1 tablet per tablet server</li>
    *   <li>metrics: 3 tablets per tablet server, no time partitioning</li>
@@ -105,7 +105,7 @@ public class CreateOptions {
     if (numTagsTablets != 0) {
       return numTagsTablets;
     } else {
-      return Math.max(1, (int) (numTabletServers * numTagsTabletsPerTabletServer));
+      return Math.max(2, (int) (numTabletServers * numTagsTabletsPerTabletServer));
     }
   }
 
@@ -113,7 +113,7 @@ public class CreateOptions {
     if (numTagsetsTablets != 0) {
       return numTagsetsTablets;
     } else {
-      return Math.max(1, (int) (numTabletServers * numTagsetsTabletsPerTabletServer));
+      return Math.max(2, (int) (numTabletServers * numTagsetsTabletsPerTabletServer));
     }
   }
 
@@ -121,7 +121,7 @@ public class CreateOptions {
     if (numMetricsHashBuckets != 0) {
       return numMetricsHashBuckets;
     } else {
-      return Math.max(1, (int) (numTabletServers * numMetricsHashBucketsPerTabletServer));
+      return Math.max(2, (int) (numTabletServers * numMetricsHashBucketsPerTabletServer));
     }
   }
 
