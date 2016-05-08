@@ -9,7 +9,7 @@
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>core</artifactId>
+  <artifactId>kudu-ts-core</artifactId>
   <name>Kudu TS Core</name>
   <version>0.1.0-SNAPSHOT</version>
 
