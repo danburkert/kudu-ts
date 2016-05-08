@@ -1,0 +1,23 @@
+kuduMasterAddresses: ["localhost"]
+kuduTSInstance: "ktsd"
+
+server:
+  type: default
+  applicationContextPath: "/api"
+  applicationConnectors:
+    - type: http
+      port: 4242
+
+logging:
+  level: INFO
+
+  appenders:
+    - type: console
+    - type: file
+      threshold: DEBUG
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      currentLogFilename: /tmp/application.log
+      archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}-%i.log.gz
+      archivedFileCount: 7
+      timeZone: UTC
+      maxFileSize: 10MB

@@ -18,6 +18,7 @@
     <!-- Maven plugins -->
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
     <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
     <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
@@ -40,6 +41,7 @@
 
   <modules>
     <module>core</module>
+    <module>ktsd</module>
     <module>argus</module>
   </modules>
 
@@ -127,6 +129,12 @@
             <source>1.7</source>
             <target>1.7</target>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
         </plugin>
 
         <plugin>
