@@ -92,7 +92,7 @@ public class Tags {
         insert.getRow().addInt(Tables.TAGS_TAGSET_ID_INDEX, id);
         session.apply(insert);
       }
-      return session.close().addCallbackDeferring(new InsertTagsetCB());
+      return session.flush().addCallbackDeferring(new InsertTagsetCB());
     } finally {
       session.close();
     }

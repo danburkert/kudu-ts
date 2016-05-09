@@ -50,13 +50,17 @@ public class QueryResource {
     LOG.trace("query: {}", request);
 
     List<Query> queries = new ArrayList<>(request.getQueries().size());
-    for (QueryOptions options : request.getQueries()) {
+    for (SubQuery options : request.getQueries()) {
       Query query = Query.create(options.metric, options.getTags(), getAggregator(options.getAggregator()));
       query.setInterpolator(getInterpolator(options.getAggregator()));
       if (options.getDownsample() != null) {
         setDownsampler(options.getDownsample(), query);
       }
+      query.setStart(request.getStart() * 1000);
+      query.setEnd(request.getEnd() * 1000);
+
       queries.add(query);
+
 
     }
 
@@ -141,15 +145,15 @@ public class QueryResource {
     query.setDownsampler(aggregator, interval);
   }
 
-  private static class Request {
+  static class Request {
     private final long start;
     private final long end;
-    private final List<QueryOptions> queries;
+    private final List<SubQuery> queries;
 
     @JsonCreator
     public Request(@JsonProperty("start") long start,
                    @JsonProperty("end") long end,
-                   @JsonProperty("queries") List<QueryOptions> queries) {
+                   @JsonProperty("queries") List<SubQuery> queries) {
       this.start = start;
       this.end = end;
       this.queries = queries;
@@ -163,7 +167,7 @@ public class QueryResource {
       return end;
     }
 
-    public List<QueryOptions> getQueries() {
+    public List<SubQuery> getQueries() {
       return queries;
     }
 
@@ -177,17 +181,17 @@ public class QueryResource {
     }
   }
 
-  private static class QueryOptions {
+  static class SubQuery {
     private String metric;
     private Map<String, String> tags;
     private String aggregator;
     private String downsample;
 
     @JsonCreator
-    public QueryOptions(@JsonProperty("metric") String metric,
-                        @JsonProperty("tags") Map<String, String> tags,
-                        @JsonProperty("aggregator") String aggregator,
-                        @JsonProperty("downsample") String downsample) {
+    public SubQuery(@JsonProperty("metric") String metric,
+                    @JsonProperty("tags") Map<String, String> tags,
+                    @JsonProperty("aggregator") String aggregator,
+                    @JsonProperty("downsample") String downsample) {
       this.metric = metric;
       this.tags = tags;
       this.aggregator = aggregator;

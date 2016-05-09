@@ -77,7 +77,7 @@ public class PutResource {
         Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
         batch.writeDatapoint(datapoint.getMetric(),
                              datapoint.getTags(),
-                             datapoint.getTimestamp(),
+                             datapoint.getTimestamp() * 1000,
                              datapoint.getValue());
       } catch (JsonProcessingException e) {
         errors.add(new Error(node, e.getMessage()));
@@ -107,7 +107,7 @@ public class PutResource {
     }
   }
 
-  private final static class Datapoint {
+  final static class Datapoint {
     @NotEmpty
     private final String metric;
     @NotEmpty

@@ -24,7 +24,6 @@ logging:
 
 bench:
   ktsdHost: "kudu-ts-1.vpc.cloudera.com"
-  # ktsdHost: "localhost"
   ktsdPort: 4242
   #metrics: ["loadavg.1min", "rss"]
   #tags:
@@ -37,5 +36,10 @@ bench:
     foo: ["bar"]
   sampleFrequency: 10
   httpClient:
-    keepAlive: "10s"
     timeout: "10s"
+    minThreads: 1
+    maxThreads: 128
+    workQueueSize: 8
+    gzipEnabled: true
+    gzipEnabledForRequests: true
+    chunkedEncodingEnabled: true

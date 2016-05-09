@@ -18,6 +18,7 @@ public class KTSDApplication extends Application<KTSDConfiguration> {
   @Override
   public void initialize(Bootstrap<KTSDConfiguration> bootstrap) {
     super.initialize(bootstrap);
+    bootstrap.addCommand(new PutBench(this));
   }
 
   @Override

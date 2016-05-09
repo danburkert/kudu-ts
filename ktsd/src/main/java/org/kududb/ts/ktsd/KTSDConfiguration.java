@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.dropwizard.Configuration;
+import io.dropwizard.client.JerseyClientConfiguration;
 
 public class KTSDConfiguration extends Configuration {
 
@@ -17,11 +21,16 @@ public class KTSDConfiguration extends Configuration {
   @NotEmpty
   private final String kuduTSInstance;
 
+  @Valid
+  BenchConfiguration bench;
+
   @JsonCreator
   public KTSDConfiguration(@JsonProperty("kuduMasterAddresses") List<String> kuduMasterAddresses,
-                           @JsonProperty("kuduTSInstance") String kuduTSInstance) {
+                           @JsonProperty("kuduTSInstance") String kuduTSInstance,
+                           @JsonProperty("bench") BenchConfiguration bench) {
     this.kuduMasterAddresses = kuduMasterAddresses;
     this.kuduTSInstance = kuduTSInstance;
+    this.bench = bench;
   }
 
   @JsonProperty
@@ -32,5 +41,10 @@ public class KTSDConfiguration extends Configuration {
   @JsonProperty
   public String getKuduTSInstance() {
     return kuduTSInstance;
+  }
+
+  @JsonProperty
+  public BenchConfiguration getBench() {
+    return bench;
   }
 }
