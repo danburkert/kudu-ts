@@ -3,12 +3,16 @@ package org.kududb.ts.ktsd;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +26,7 @@ import javax.ws.rs.core.Response;
 
 import org.kududb.ts.core.Aggregator;
 import org.kududb.ts.core.Aggregators;
+import org.kududb.ts.core.Datapoint;
 import org.kududb.ts.core.Datapoints;
 import org.kududb.ts.core.Interpolators;
 import org.kududb.ts.core.KuduTS;
@@ -33,19 +38,21 @@ import io.dropwizard.validation.Validated;
 
 @Path("/query")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 public class QueryResource {
   private static final Logger LOG = LoggerFactory.getLogger(QueryResource.class);
   private static final Pattern INTERPOLATOR_REGEX = Pattern.compile("^([0-9]+)([A-z]+)-([A-z]+)$");
 
   private final KuduTS ts;
+  private final ObjectMapper mapper;
 
-  public QueryResource(KuduTS ts) {
+  public QueryResource(KuduTS ts, ObjectMapper mapper) {
     this.ts = ts;
+    this.mapper = mapper;
   }
 
   @POST
   @Timed
+  @Consumes(MediaType.APPLICATION_JSON)
   public List<Result> query(@Validated Request request) throws Exception {
     LOG.trace("query: {}", request);
 
@@ -57,7 +64,9 @@ public class QueryResource {
         setDownsampler(options.getDownsample(), query);
       }
       query.setStart(request.getStart() * 1000);
-      query.setEnd(request.getEnd() * 1000);
+      if (request.getEnd() != 0) {
+        query.setEnd(request.getEnd() * 1000);
+      }
 
       queries.add(query);
 
@@ -70,10 +79,18 @@ public class QueryResource {
     for (Query query : queries) {
       List<Datapoints> datasets = ts.query(query);
       for (Datapoints dataset : datasets) {
-        results.add(new Result(dataset));
+        results.add(new Result(dataset, query.getTags()));
       }
     }
+    LOG.info("{} results for request: {}, queries: {}", results, request, queries);
     return results;
+  }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public List<Result> queryFormURLEncoded(String request) throws Exception {
+    LOG.info("Form Request: {}", request);
+    return query(mapper.treeToValue(mapper.readTree(request), Request.class));
   }
 
   private static TimeUnit getTimeUnit(String timeUnit) {
@@ -130,7 +147,6 @@ public class QueryResource {
   }
 
   private static void setDownsampler(String downsampler, Query query) {
-    String[] parts = downsampler.split("-");
     Matcher matcher = INTERPOLATOR_REGEX.matcher(downsampler);
     if (!matcher.matches()) throw new WebApplicationException("Illegal downsampler: " + downsampler,
                                                               Response.Status.BAD_REQUEST);
@@ -153,7 +169,12 @@ public class QueryResource {
     @JsonCreator
     public Request(@JsonProperty("start") long start,
                    @JsonProperty("end") long end,
-                   @JsonProperty("queries") List<SubQuery> queries) {
+                   @JsonProperty("queries") List<SubQuery> queries,
+                   @JsonProperty("msResolution") BooleanFlag msResolution,
+                   @JsonProperty("globalAnnotations") BooleanFlag globalAnnotations) {
+      if (!msResolution.get()) {
+        throw new WebApplicationException("Must specify ms resolution", Response.Status.BAD_REQUEST);
+      }
       this.start = start;
       this.end = end;
       this.queries = queries;
@@ -226,9 +247,11 @@ public class QueryResource {
   }
 
   private static class Result {
+    private Map<String, String> tags;
     private final Datapoints datapoints;
 
-    public Result(Datapoints datapoints) {
+    public Result(Datapoints datapoints, Map<String, String> tags) {
+      this.tags = tags;
       this.datapoints = datapoints;
     }
 
@@ -238,19 +261,33 @@ public class QueryResource {
     }
 
     @JsonProperty("dps")
-    public String getDatapoints() {
-      StringBuilder sb = new StringBuilder();
-      sb.append('{');
-      for (int i = 0; i < datapoints.size(); i++) {
-        if (i != 0) sb.append(",");
-        sb.append('"');
-        sb.append(datapoints.getTime(i));
-        sb.append(':');
-        sb.append(datapoints.getValue(i));
+    public Map<Long, Double> getDatapoints() {
+      Map<Long, Double> dps = new TreeMap<>();
+      for (Datapoint dp : datapoints) {
+        dps.put(dp.getTime() / 1000, dp.getValue());
       }
-      sb.append('}');
 
-      return sb.toString();
+      LOG.info("dps: {}", dps);
+      return dps;
+    }
+
+    @JsonProperty("tags")
+    Map<String, String> getTags() {
+      return tags;
+    }
+
+    @JsonProperty("aggregatedTags")
+    List<String> getAggregatedTags() {
+      return ImmutableList.of();
+    }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+                        .add("datapoints", datapoints)
+                        .add("tags", getTags())
+                        .add("aggregatedTags", getAggregatedTags())
+                        .toString();
     }
   }
 }

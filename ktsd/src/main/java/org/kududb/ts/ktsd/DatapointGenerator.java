@@ -33,7 +33,7 @@ public class DatapointGenerator extends UnmodifiableIterator<Datapoint> {
 
     nextSample = 0;
     nextValue = Math.log(1-rand.nextDouble())/(-0.01);
-    variance = Math.sqrt(nextValue);
+    variance = nextValue;
     LOG.info("start time: {}", start);
     LOG.info("end time: {}", end);
   }
@@ -46,8 +46,9 @@ public class DatapointGenerator extends UnmodifiableIterator<Datapoint> {
   @Override
   public Datapoint next() {
     Datapoint dp = Datapoint.create(nextTime, nextValue);
+    LOG.info("next value: {}", nextValue);
     nextTime = (long) (start + 1000 * (++nextSample) / frequency);
-    nextValue += Math.max(0, rand.nextDouble() * variance);
+    nextValue = Math.max(0, nextValue + ((rand.nextDouble() - 0.5) * 2) * variance);
     return dp;
   }
 }

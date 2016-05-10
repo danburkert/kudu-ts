@@ -10,6 +10,8 @@ server:
 
 logging:
   level: INFO
+  loggers:
+    org.kududb.ts: INFO
 
   appenders:
     - type: console
@@ -23,19 +25,19 @@ logging:
       maxFileSize: 10MB
 
 bench:
-  ktsdHost: "kudu-ts-1.vpc.cloudera.com"
-  # ktsdHost: "localhost"
+  #ktsdHost: "kudu-ts-1.vpc.cloudera.com"
+  ktsdHost: "localhost"
   ktsdPort: 4242
-  #metrics: ["loadavg.1min", "rss"]
+  metrics: ["loadavg.1min"]
   #tags:
     #host: ["web01", "web02", "web03",
            #"db01", "db02", "db03"]
     #dc: ["dc01", "dc02", "dc03"]
 
-  metrics: ["foo"]
+  #metrics: ["foo"]
   tags:
-    foo: ["bar"]
-  sampleFrequency: 10
+    dc: ["east"]
+  sampleFrequency: 1
   httpClient:
     keepAlive: "10s"
     timeout: "10s"

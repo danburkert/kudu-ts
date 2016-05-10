@@ -27,6 +27,7 @@ public class KTSDApplication extends Application<KTSDConfiguration> {
     ManagedKuduTS ts = new ManagedKuduTS(configuration);
     environment.lifecycle().manage(ts);
     environment.jersey().register(new PutResource(ts.ts(), environment.getObjectMapper()));
-    environment.jersey().register(new QueryResource(ts.ts()));
+    environment.jersey().register(new QueryResource(ts.ts(), environment.getObjectMapper()));
+    environment.jersey().register(new SuggestResource(ts.ts()));
   }
 }

@@ -8,6 +8,10 @@ public class BooleanFlag extends AbstractParam<Boolean> {
     super(input);
   }
 
+  public BooleanFlag(boolean input) {
+    super(Boolean.toString(input));
+  }
+
   @Override
   protected String errorMessage(Exception e) {
     return "Parameter must be \"true\" or \"false\".";
