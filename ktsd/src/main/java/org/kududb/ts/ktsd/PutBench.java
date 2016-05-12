@@ -53,7 +53,6 @@ public class PutBench extends EnvironmentCommand<KTSDConfiguration> {
 
     LatencyStats stats = new LatencyStats();
 
-
     List<SortedMap<String, String>> tags = new ArrayList<>();
     tags.add(new TreeMap<String, String>());
     for (Map.Entry<String, List<String>> tag : config.getBench().getTags().entrySet()) {

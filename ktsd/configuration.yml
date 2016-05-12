@@ -25,19 +25,25 @@ logging:
       maxFileSize: 10MB
 
 bench:
-  #ktsdHost: "kudu-ts-1.vpc.cloudera.com"
   ktsdHost: "localhost"
   ktsdPort: 4242
-  metrics: ["loadavg.1min", "requestCount", "errorCount"]
+  metrics: [
+              "metric00",
+              "metric01",
+              "metric02",
+              "metric03",
+              "metric04",
+              "metric05",
+              "metric06",
+              "metric07",
+              "metric08",
+              "metric09",
+           ]
   tags:
-    host: ["web01", "web02", "web03",
-           "db01", "db02", "db03"]
-    dc: ["us-east", "us-west", "asia"]
-
-  #start: 10000000
-  #metrics: ["loadavg.1min"]
-  #tags:
-    #dc: ["east"]
+    host: [ "host00", "host01", "host02", "host03" ]
+    dc: [ "dc00", "dc01", "dc02", "dc03" ]
+  start: 1451606400000 # 2016-01-01T00:00:00
+  end: 1451692800000 # 2016-01-02T00:00:00
   sampleFrequency: 1
   httpClient:
     keepAlive: "10s"
