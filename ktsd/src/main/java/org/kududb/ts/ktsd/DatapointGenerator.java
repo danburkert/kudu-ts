@@ -46,7 +46,6 @@ public class DatapointGenerator extends UnmodifiableIterator<Datapoint> {
   @Override
   public Datapoint next() {
     Datapoint dp = Datapoint.create(nextTime, nextValue);
-    LOG.info("next value: {}", nextValue);
     nextTime = (long) (start + 1000 * (++nextSample) / frequency);
     nextValue = Math.max(0, nextValue + ((rand.nextDouble() - 0.5) * 2) * variance);
     return dp;

@@ -28,15 +28,16 @@ bench:
   #ktsdHost: "kudu-ts-1.vpc.cloudera.com"
   ktsdHost: "localhost"
   ktsdPort: 4242
-  metrics: ["loadavg.1min"]
-  #tags:
-    #host: ["web01", "web02", "web03",
-           #"db01", "db02", "db03"]
-    #dc: ["dc01", "dc02", "dc03"]
-
-  #metrics: ["foo"]
+  metrics: ["loadavg.1min", "requestCount", "errorCount"]
   tags:
-    dc: ["east"]
+    host: ["web01", "web02", "web03",
+           "db01", "db02", "db03"]
+    dc: ["us-east", "us-west", "asia"]
+
+  #start: 10000000
+  #metrics: ["loadavg.1min"]
+  #tags:
+    #dc: ["east"]
   sampleFrequency: 1
   httpClient:
     keepAlive: "10s"
