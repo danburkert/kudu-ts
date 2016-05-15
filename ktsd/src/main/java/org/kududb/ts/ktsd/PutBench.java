@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.HdrHistogram.Histogram;
@@ -32,9 +33,9 @@ public class PutBench extends EnvironmentCommand<KTSDConfiguration> {
                      Namespace namespace,
                      KTSDConfiguration config) throws Exception {
 
-    final CloseableHttpClient client = new HttpClientBuilder(environment).using(config.getBench().getHttpClient())
-                                                                         .build(getName());
-    environment.jersey().register(client);
+    final CloseableHttpClient client =
+        new HttpClientBuilder(environment).using(config.getBench().getHttpClient())
+                                          .build(getName());
 
     long start = config.getBench().getStart();
     long end = config.getBench().getEnd();
@@ -47,11 +48,8 @@ public class PutBench extends EnvironmentCommand<KTSDConfiguration> {
         .setHost(config.getBench().getKtsdHost())
         .setPort(config.getBench().getKtsdPort())
         .setPath("/api/put")
-        .setParameter("details", "true")
-        .setParameter("sync", String.valueOf(config.getBench().isSync()))
+        .setParameter("summary", "true")
         .build();
-
-    LatencyStats stats = new LatencyStats();
 
     List<SortedMap<String, String>> tags = new ArrayList<>();
     tags.add(new TreeMap<String, String>());
@@ -67,12 +65,16 @@ public class PutBench extends EnvironmentCommand<KTSDConfiguration> {
       }
     }
 
+    CountDownLatch latch = new CountDownLatch(config.getBench().getMetrics().size() * tags.size());
+    LatencyStats stats = new LatencyStats();
+
     List<Thread> threads = new ArrayList<>();
     for (String metric : config.getBench().getMetrics()) {
       for (SortedMap<String, String> tagset : tags) {
         DatapointGenerator datapoints = new DatapointGenerator(threads.size(), start, end,
                                                                config.getBench().getSampleFrequency());
-        threads.add(new Thread(new PutSeries(uri, metric, tagset, datapoints, stats, client, environment.getObjectMapper())));
+        threads.add(new Thread(new PutSeries(uri, metric, tagset, datapoints, stats,
+                                             client, environment.getObjectMapper(), latch)));
       }
     }
 
@@ -80,12 +82,26 @@ public class PutBench extends EnvironmentCommand<KTSDConfiguration> {
       thread.start();
     }
 
-    for (Thread thread : threads) {
-      thread.join();
+    Histogram hist = stats.getIntervalHistogram();
+    while (!latch.await(10, TimeUnit.SECONDS)) {
+      Histogram latest = stats.getIntervalHistogram();
+      hist.add(latest);
+
+      LOG.info("Progress:");
+      LOG.info("puts: {}/{}", latest.getTotalCount(), hist.getTotalCount());
+      LOG.info("mean latency: {}/{}", TimeUnit.NANOSECONDS.toMillis((long) latest.getMean()),
+                                      TimeUnit.NANOSECONDS.toMillis((long) hist.getMean()));
+      LOG.info("min: {}/{}", TimeUnit.NANOSECONDS.toMillis(latest.getMinValue()),
+                             TimeUnit.NANOSECONDS.toMillis(hist.getMinValue()));
+      LOG.info("max: {}/{}", TimeUnit.NANOSECONDS.toMillis(latest.getMaxValue()),
+                             TimeUnit.NANOSECONDS.toMillis(hist.getMaxValue()));
+      LOG.info("p50: {}/{}", TimeUnit.NANOSECONDS.toMillis(latest.getValueAtPercentile(50)),
+                             TimeUnit.NANOSECONDS.toMillis(hist.getValueAtPercentile(50)));
+      LOG.info("p99: {}/{}", TimeUnit.NANOSECONDS.toMillis(latest.getValueAtPercentile(99)),
+                             TimeUnit.NANOSECONDS.toMillis(hist.getValueAtPercentile(99)));
     }
 
-    Histogram hist = stats.getIntervalHistogram();
-
+    LOG.info("Benchmark complete");
     LOG.info("puts: {}", hist.getTotalCount());
     LOG.info("mean latency: {}", TimeUnit.NANOSECONDS.toMillis((long) hist.getMean()));
     LOG.info("stddev: {}", TimeUnit.NANOSECONDS.toMillis((long) hist.getStdDeviation()));

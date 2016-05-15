@@ -34,8 +34,6 @@ public class DatapointGenerator extends UnmodifiableIterator<Datapoint> {
     nextSample = 0;
     nextValue = Math.log(1-rand.nextDouble())/(-0.01);
     variance = nextValue;
-    LOG.info("start time: {}", start);
-    LOG.info("end time: {}", end);
   }
 
   @Override

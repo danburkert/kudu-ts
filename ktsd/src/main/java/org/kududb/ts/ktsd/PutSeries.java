@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.core.Response;
+import java.util.concurrent.CountDownLatch;
 
 import org.LatencyUtils.LatencyStats;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,6 +26,7 @@ public class PutSeries implements Runnable {
   private final LatencyStats stats;
   private final CloseableHttpClient client;
   private final ObjectMapper mapper;
+  private final CountDownLatch latch;
 
   public PutSeries(URI url,
                    String metric,
@@ -35,7 +34,8 @@ public class PutSeries implements Runnable {
                    DatapointGenerator datapoints,
                    LatencyStats stats,
                    CloseableHttpClient client,
-                   ObjectMapper mapper) {
+                   ObjectMapper mapper,
+                   CountDownLatch latch) {
     this.url = url;
     this.metric = metric;
     this.tags = tags;
@@ -43,32 +43,36 @@ public class PutSeries implements Runnable {
     this.stats = stats;
     this.client = client;
     this.mapper = mapper;
+    this.latch = latch;
   }
 
   @Override
   public void run() {
-    while (datapoints.hasNext()) {
-      Datapoint dp = datapoints.next();
-      long start = System.nanoTime();
+    try {
+      while (datapoints.hasNext()) {
+        Datapoint dp = datapoints.next();
+        long start = System.nanoTime();
 
-      HttpPost post = new HttpPost(url);
-      try {
-        post.setEntity(new StringEntity(
-            mapper.writeValueAsString(new PutResource.Datapoint(metric, tags, dp.getTime(), dp.getValue())),
-            ContentType.APPLICATION_JSON
-        ));
+        HttpPost post = new HttpPost(url);
+        try {
+          post.setEntity(new StringEntity(
+              mapper.writeValueAsString(new PutResource.Datapoint(metric, tags, dp.getTime(), dp.getValue())),
+              ContentType.APPLICATION_JSON
+          ));
 
-        try (CloseableHttpResponse response = client.execute(post)) {
-          if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
-            throw new RuntimeException(response.toString());
+          try (CloseableHttpResponse response = client.execute(post)) {
+            if (response.getStatusLine().getStatusCode() < 200 ||
+                response.getStatusLine().getStatusCode() >= 300) {
+              throw new RuntimeException(response.toString());
+            }
+            stats.recordLatency(System.nanoTime() - start);
           }
-          long nanos = System.nanoTime() - start;
-          stats.recordLatency(System.nanoTime() - start);
-          LOG.info("success: {}ms", TimeUnit.NANOSECONDS.toMillis(nanos));
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
-      } catch (Exception e) {
-        throw new RuntimeException(e);
       }
+    } finally {
+      latch.countDown();
     }
   }
 }
