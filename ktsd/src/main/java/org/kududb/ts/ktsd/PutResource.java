@@ -63,52 +63,57 @@ public class PutResource implements Managed {
               summary, details, sync, sync_timeout, body);
 
     WriteBatch batch = ts.writeBatch();
-    batch.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND);
-    if (sync_timeout.get() > 0) batch.setTimeoutMillis(sync_timeout.get());
+    try {
+      batch.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND);
+      if (sync_timeout.get() > 0) batch.setTimeoutMillis(sync_timeout.get());
 
-    int datapoints = 0;
-    List<Error> errors = new ArrayList<>();
-    Iterator<JsonNode> nodes;
-    if (body.isArray()) {
-      nodes = body.elements();
-    } else {
-      nodes = Iterators.singletonIterator(body);
-    }
-
-    while (nodes.hasNext()) {
-      datapoints++;
-      JsonNode node = nodes.next();
-      try {
-        Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
-        batch.writeDatapoint(datapoint.getMetric(),
-                             datapoint.getTags(),
-                             datapoint.getTimestamp() * 1000,
-                             datapoint.getValue());
-      } catch (JsonProcessingException e) {
-        errors.add(new Error(node, e.getMessage()));
-      }
-    }
-
-    batch.flush();
-    RowErrorsAndOverflowStatus batchErrors = batch.getPendingErrors();
-    for (RowError rowError : batchErrors.getRowErrors()) {
-      errors.add(new Error(null, rowError.getErrorStatus().toString()));
-    }
-
-    if (errors.isEmpty()) {
-      LOG.debug("put {} datapoints: {}", datapoints, body);
-      return Response.noContent().build();
-    } else {
-      LOG.error("failed to write {} of {} body: {}", errors.size(), datapoints, errors);
-      if (details.get()) {
-        Detail detail = new Detail(errors, errors.size(), datapoints - errors.size());
-        return Response.status(Response.Status.BAD_REQUEST).entity(detail).build();
-      } else if (summary.get()) {
-        Summary s = new Summary(errors.size(), datapoints - errors.size());
-        return Response.status(Response.Status.BAD_REQUEST).entity(s).build();
+      int datapoints = 0;
+      List<Error> errors = new ArrayList<>();
+      Iterator<JsonNode> nodes;
+      if (body.isArray()) {
+        nodes = body.elements();
       } else {
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        nodes = Iterators.singletonIterator(body);
       }
+
+      while (nodes.hasNext()) {
+        datapoints++;
+        JsonNode node = nodes.next();
+        try {
+          Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
+          batch.writeDatapoint(datapoint.getMetric(),
+                               datapoint.getTags(),
+                               datapoint.getTimestamp() * 1000,
+                               datapoint.getValue());
+        } catch (JsonProcessingException e) {
+          errors.add(new Error(node, e.getMessage()));
+        }
+      }
+
+      batch.flush();
+      RowErrorsAndOverflowStatus batchErrors = batch.getPendingErrors();
+      for (RowError rowError : batchErrors.getRowErrors()) {
+        errors.add(new Error(null, rowError.getErrorStatus().toString()));
+      }
+
+      if (errors.isEmpty()) {
+        LOG.debug("put {} datapoints: {}", datapoints, body);
+        return Response.noContent().build();
+      } else {
+        LOG.error("failed to write {} of {} body: {}", errors.size(), datapoints, errors);
+        if (details.get()) {
+          Detail detail = new Detail(errors, errors.size(), datapoints - errors.size());
+          return Response.status(Response.Status.BAD_REQUEST).entity(detail).build();
+        } else if (summary.get()) {
+          Summary s = new Summary(errors.size(), datapoints - errors.size());
+          return Response.status(Response.Status.BAD_REQUEST).entity(s).build();
+        } else {
+          return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+      }
+
+    } finally {
+      batch.close();
     }
   }
 
