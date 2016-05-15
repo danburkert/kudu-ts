@@ -53,16 +53,24 @@ public class Tags {
    * @return The tagset ID.
    */
   public Deferred<Integer> insertTagset(final int id, final SortedMap<String, String> tagset) {
+    if (tagset.isEmpty()) { return Deferred.fromResult(id); }
+    LOG.debug("Inserting tags; tagsetID: {}, tags: {}", id, tagset);
+    final AsyncKuduSession session = client.newSession();
+
     class InsertTagsetCB implements Callback<Deferred<Integer>, List<OperationResponse>> {
       @Override
       public Deferred<Integer> call(List<OperationResponse> responses) {
-        for (OperationResponse response : responses) {
-          if (response.hasRowError()) {
-            return Deferred.fromError(new RuntimeException(
-                String.format("Unable to insert tag: %s", response.getRowError())));
+        try {
+          for (OperationResponse response : responses) {
+            if (response.hasRowError()) {
+              return Deferred.fromError(new RuntimeException(
+                  String.format("Unable to insert tag: %s", response.getRowError())));
+            }
           }
+          return Deferred.fromResult(id);
+        } finally {
+          session.close();
         }
-        return Deferred.fromResult(id);
       }
       @Override
       public String toString() {
@@ -73,29 +81,27 @@ public class Tags {
       }
     }
 
-    if (tagset.isEmpty()) { return Deferred.fromResult(id); }
-    LOG.debug("Inserting tags; tagsetID: {}, tags: {}", id, tagset);
-    AsyncKuduSession session = client.newSession();
-    try {
-      // buffer all of the tags into the session, and ensure that we don't get
-      // a PleaseThrottleException. In practice the number of tags should be
-      // small.
+    if (tagset.size() > 1000) {
       session.setMutationBufferSpace(tagset.size());
-      session.setMutationBufferLowWatermark(1.0f);
-      session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
-      for (Map.Entry<String, String> tag : tagset.entrySet()) {
-        Insert insert = table.newInsert();
-        // TODO: check with JD that if the inserts below fail, the error will
-        // also be returned in the flush call.
-        insert.getRow().addString(Tables.TAGS_KEY_INDEX, tag.getKey());
-        insert.getRow().addString(Tables.TAGS_VALUE_INDEX, tag.getValue());
-        insert.getRow().addInt(Tables.TAGS_TAGSET_ID_INDEX, id);
-        session.apply(insert);
-      }
-      return session.flush().addCallbackDeferring(new InsertTagsetCB());
-    } finally {
-      session.close();
     }
+    session.setMutationBufferLowWatermark(1.0f);
+
+    // buffer all of the tags into the session, and ensure that we don't get
+    // a PleaseThrottleException. In practice the number of tags should be
+    // small.
+    session.setMutationBufferSpace(tagset.size());
+    session.setMutationBufferLowWatermark(1.0f);
+    session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
+    for (Map.Entry<String, String> tag : tagset.entrySet()) {
+      Insert insert = table.newInsert();
+      // TODO: check with JD that if the inserts below fail, the error will
+      // also be returned in the flush call.
+      insert.getRow().addString(Tables.TAGS_KEY_INDEX, tag.getKey());
+      insert.getRow().addString(Tables.TAGS_VALUE_INDEX, tag.getValue());
+      insert.getRow().addInt(Tables.TAGS_TAGSET_ID_INDEX, id);
+      session.apply(insert);
+    }
+    return session.flush().addCallbackDeferring(new InsertTagsetCB());
   }
 
   /**

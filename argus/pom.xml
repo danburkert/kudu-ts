@@ -63,7 +63,7 @@
         <configuration>
           <artifactSet>
             <includes>
-              <include>org.kududb.ts:core</include>
+              <include>org.kududb.ts:kudu-ts-core</include>
             </includes>
           </artifactSet>
         </configuration>
