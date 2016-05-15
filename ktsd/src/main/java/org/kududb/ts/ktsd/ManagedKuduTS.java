@@ -12,7 +12,8 @@ public class ManagedKuduTS implements Managed {
   public ManagedKuduTS(KTSDConfiguration configuration) throws Exception {
     ts = KuduTS.openOrCreate(configuration.getKuduMasterAddresses(),
                              configuration.getKuduTSInstance(),
-                             CreateOptions.defaults());
+                             CreateOptions.defaults()
+                                          .setNumReplicas(configuration.getKuduTSReplicas()));
   }
 
   public KuduTS ts() {

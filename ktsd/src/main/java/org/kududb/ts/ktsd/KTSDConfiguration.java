@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
+import io.dropwizard.jersey.params.IntParam;
 
 public class KTSDConfiguration extends Configuration {
 
@@ -21,15 +22,20 @@ public class KTSDConfiguration extends Configuration {
   @NotEmpty
   private final String kuduTSInstance;
 
+  private final int kuduTSReplicas;
+
   @Valid
   BenchConfiguration bench;
+
 
   @JsonCreator
   public KTSDConfiguration(@JsonProperty("kuduMasterAddresses") List<String> kuduMasterAddresses,
                            @JsonProperty("kuduTSInstance") String kuduTSInstance,
+                           @JsonProperty("kuduTSReplicas") int replicas,
                            @JsonProperty("bench") BenchConfiguration bench) {
     this.kuduMasterAddresses = kuduMasterAddresses;
     this.kuduTSInstance = kuduTSInstance;
+    this.kuduTSReplicas = replicas;
     this.bench = bench;
   }
 
@@ -41,6 +47,11 @@ public class KTSDConfiguration extends Configuration {
   @JsonProperty
   public String getKuduTSInstance() {
     return kuduTSInstance;
+  }
+
+  @JsonProperty
+  public int getKuduTSReplicas() {
+    return kuduTSReplicas;
   }
 
   @JsonProperty

@@ -1,5 +1,6 @@
 kuduMasterAddresses: ["localhost"]
 kuduTSInstance: "ktsd"
+kuduTSReplicas: 1
 
 server:
   type: default
