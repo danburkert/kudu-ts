@@ -42,7 +42,8 @@
   <modules>
     <module>core</module>
     <module>ktsd</module>
-    <module>argus</module>
+    <!-- TODO: reenable once argus publishes to maven central -->
+    <!--<module>argus</module>-->
   </modules>
 
   <dependencyManagement>
