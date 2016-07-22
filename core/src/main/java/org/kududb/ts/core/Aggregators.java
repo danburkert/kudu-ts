@@ -1,7 +1,5 @@
 package org.kududb.ts.core;
 
-import static com.sun.tools.doclint.Entity.sum;
-
 import com.google.common.base.MoreObjects;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -144,6 +142,7 @@ public class Aggregators {
         oldS = newS;
       }
     }
+
     @Override
     public double aggregatedValue() {
       double stddev = Math.sqrt(newS / (samples - 1));
@@ -152,7 +151,10 @@ public class Aggregators {
     }
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).add("sum", sum).toString();
+      return MoreObjects.toStringHelper(this)
+                        .add("stddev", Math.sqrt(newS / (samples - 1)))
+                        .add("samples", samples)
+                        .toString();
     }
   }
 }

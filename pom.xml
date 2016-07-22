@@ -28,7 +28,7 @@
     <guava.version>18.0</guava.version>
     <jsr305.version>3.0.1</jsr305.version>
     <junit.version>4.11</junit.version>
-    <kudu.version>0.9.0-SNAPSHOT</kudu.version>
+    <kudu.version>0.9.1</kudu.version>
     <log4j.version>1.2.17</log4j.version>
     <slf4j.version>1.7.21</slf4j.version>
 
