@@ -63,9 +63,9 @@ public class QueryResource {
       if (options.getDownsample() != null) {
         setDownsampler(options.getDownsample(), query);
       }
-      query.setStart(request.getStart() * 1000);
+      query.setStart(request.getStart());
       if (request.getEnd() != 0) {
-        query.setEnd(request.getEnd() * 1000);
+        query.setEnd(request.getEnd());
       }
 
       queries.add(query);
@@ -172,11 +172,13 @@ public class QueryResource {
                    @JsonProperty("queries") List<SubQuery> queries,
                    @JsonProperty("msResolution") BooleanFlag msResolution,
                    @JsonProperty("globalAnnotations") BooleanFlag globalAnnotations) {
-      if (!msResolution.get()) {
-        throw new WebApplicationException("Must specify ms resolution", Response.Status.BAD_REQUEST);
+      if (msResolution.get()) {
+        this.start = start * 1000;
+        this.end = end * 1000;
+      } else {
+        this.start = start * 1000 * 1000;
+        this.end = end * 1000 * 1000;
       }
-      this.start = start;
-      this.end = end;
       this.queries = queries;
     }
 

@@ -19,6 +19,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -83,7 +84,7 @@ public class PutResource implements Managed {
           Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
           batch.writeDatapoint(datapoint.getMetric(),
                                datapoint.getTags(),
-                               datapoint.getTimestamp() * 1000,
+                               datapoint.getTimestamp(),
                                datapoint.getValue());
         } catch (JsonProcessingException e) {
           errors.add(new Error(node, e.getMessage()));
@@ -135,7 +136,7 @@ public class PutResource implements Managed {
         Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
         batch.writeDatapoint(datapoint.getMetric(),
                              datapoint.getTags(),
-                             datapoint.getTimestamp() * 1000,
+                             datapoint.getTimestamp(),
                              datapoint.getValue());
       } catch (JsonProcessingException e) {
         errors.add(new Error(node, e.getMessage()));
@@ -182,7 +183,7 @@ public class PutResource implements Managed {
         Datapoint datapoint = mapper.treeToValue(node, Datapoint.class);
         batch.writeDatapoint(datapoint.getMetric(),
                              datapoint.getTags(),
-                             datapoint.getTimestamp() * 1000,
+                             datapoint.getTimestamp(),
                              datapoint.getValue());
       } catch (JsonProcessingException e) {
         errors.add(new Error(node, e.getMessage()));
@@ -239,7 +240,14 @@ public class PutResource implements Managed {
                      @JsonProperty("value") double value) {
       this.metric = metric;
       this.tags = tags;
-      this.timestamp = timestamp;
+      if (timestamp < 10000000000l) {
+        this.timestamp = timestamp * 1000 * 1000;
+      } else if (timestamp < 10000000000000l){
+        this.timestamp = timestamp * 1000;
+      } else {
+        throw new WebApplicationException("Illegal timestamp: " + timestamp,
+                                          Response.Status.BAD_REQUEST);
+      }
       this.value = value;
     }
 
