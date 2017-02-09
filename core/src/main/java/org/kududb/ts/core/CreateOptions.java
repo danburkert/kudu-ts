@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.annotations.InterfaceStability;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceStability;
 
 @InterfaceAudience.Public
 @InterfaceStability.Unstable

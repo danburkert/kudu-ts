@@ -2,12 +2,12 @@ package org.kududb.ts.core;
 
 import com.google.common.collect.ImmutableList;
 
-import org.kududb.ColumnSchema;
-import org.kududb.Schema;
-import org.kududb.Type;
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.client.CreateTableOptions;
-import org.kududb.client.PartialRow;
+import org.apache.kudu.ColumnSchema;
+import org.apache.kudu.Schema;
+import org.apache.kudu.Type;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.client.CreateTableOptions;
+import org.apache.kudu.client.PartialRow;
 
 /**
  * {@code Tables} holds meta information about the table schemas used by {@code KuduTS}.
@@ -41,7 +41,7 @@ class Tables {
           .compressionAlgorithm(ColumnSchema.CompressionAlgorithm.LZ4)
                                                                    .build();
   static final ColumnSchema METRICS_TIME_COLUMN =
-      new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP)
+      new ColumnSchema.ColumnSchemaBuilder("time", Type.UNIXTIME_MICROS)
                       .nullable(false)
                       .key(true)
                       .encoding(ColumnSchema.Encoding.BIT_SHUFFLE)

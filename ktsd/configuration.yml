@@ -12,7 +12,7 @@ server:
 logging:
   level: INFO
   loggers:
-    org.kududb.ts: INFO
+    org.kududb.ts: INFO 
 
   appenders:
     - type: console

@@ -1,4 +1,4 @@
-package org.kududb.client;
+package org.apache.kudu.client;
 
 public final class AbstractionBulldozer {
 

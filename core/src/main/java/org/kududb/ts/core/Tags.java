@@ -11,18 +11,19 @@ import java.util.Map;
 import java.util.SortedMap;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.client.AsyncKuduClient;
-import org.kududb.client.AsyncKuduScanner;
-import org.kududb.client.AsyncKuduSession;
-import org.kududb.client.Insert;
-import org.kududb.client.KuduPredicate;
-import org.kududb.client.KuduPredicate.ComparisonOp;
-import org.kududb.client.KuduTable;
-import org.kududb.client.OperationResponse;
-import org.kududb.client.RowResult;
-import org.kududb.client.RowResultIterator;
-import org.kududb.client.SessionConfiguration;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.client.AsyncKuduClient;
+import org.apache.kudu.client.AsyncKuduScanner;
+import org.apache.kudu.client.AsyncKuduSession;
+import org.apache.kudu.client.Insert;
+import org.apache.kudu.client.KuduException;
+import org.apache.kudu.client.KuduPredicate;
+import org.apache.kudu.client.KuduPredicate.ComparisonOp;
+import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.RowResult;
+import org.apache.kudu.client.RowResultIterator;
+import org.apache.kudu.client.SessionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,8 @@ public class Tags {
    * @param tagset the tagset.
    * @return The tagset ID.
    */
-  public Deferred<Integer> insertTagset(final int id, final SortedMap<String, String> tagset) {
+  public Deferred<Integer> insertTagset(final int id, final SortedMap<String, String> tagset)
+      throws KuduException {
     if (tagset.isEmpty()) { return Deferred.fromResult(id); }
     LOG.debug("Inserting tags; tagsetID: {}, tags: {}", id, tagset);
     final AsyncKuduSession session = client.newSession();

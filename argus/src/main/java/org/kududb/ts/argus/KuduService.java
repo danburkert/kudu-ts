@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.kududb.client.OperationResponse;
-import org.kududb.client.SessionConfiguration;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.SessionConfiguration;
 import org.kududb.ts.core.Aggregator;
 import org.kududb.ts.core.Aggregators;
 import org.kududb.ts.core.CreateOptions;

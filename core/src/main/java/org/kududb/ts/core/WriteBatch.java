@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.SortedMap;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.annotations.InterfaceStability;
-import org.kududb.client.ExternalConsistencyMode;
-import org.kududb.client.KuduSession;
-import org.kududb.client.OperationResponse;
-import org.kududb.client.RowErrorsAndOverflowStatus;
-import org.kududb.client.SessionConfiguration;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceStability;
+import org.apache.kudu.client.ExternalConsistencyMode;
+import org.apache.kudu.client.KuduSession;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.RowErrorsAndOverflowStatus;
+import org.apache.kudu.client.SessionConfiguration;
 
 @InterfaceAudience.Public
 @InterfaceStability.Unstable

@@ -15,12 +15,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.kududb</groupId>
+      <groupId>org.apache.kudu</groupId>
       <artifactId>kudu-client</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.kududb</groupId>
+      <groupId>org.apache.kudu</groupId>
       <artifactId>interface-annotations</artifactId>
     </dependency>
 
@@ -40,7 +40,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.kududb</groupId>
+      <groupId>org.apache.kudu</groupId>
       <artifactId>kudu-client</artifactId>
       <version>${kudu.version}</version>
       <type>test-jar</type>
@@ -98,7 +98,7 @@
         <configuration>
           <artifactSet>
             <includes>
-              <include>org.kududb:kudu-client</include>
+              <include>org.apache.kudu:kudu-client</include>
               <include>com.google.guava:guava</include>
               <include>com.stumbleupon:async</include>
             </includes>

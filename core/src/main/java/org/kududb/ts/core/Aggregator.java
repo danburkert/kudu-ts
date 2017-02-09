@@ -2,8 +2,8 @@ package org.kududb.ts.core;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.annotations.InterfaceStability;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceStability;
 
 @InterfaceAudience.Public
 @InterfaceStability.Evolving

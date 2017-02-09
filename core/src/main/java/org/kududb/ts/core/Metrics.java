@@ -8,15 +8,16 @@ import com.stumbleupon.async.Deferred;
 import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.client.AbstractionBulldozer;
-import org.kududb.client.AsyncKuduClient;
-import org.kududb.client.AsyncKuduScanner;
-import org.kududb.client.Insert;
-import org.kududb.client.KuduPredicate;
-import org.kududb.client.KuduTable;
-import org.kududb.client.RowResult;
-import org.kududb.client.RowResultIterator;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.client.AbstractionBulldozer;
+import org.apache.kudu.client.AsyncKuduClient;
+import org.apache.kudu.client.AsyncKuduScanner;
+import org.apache.kudu.client.Insert;
+import org.apache.kudu.client.Upsert;
+import org.apache.kudu.client.KuduPredicate;
+import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.RowResult;
+import org.apache.kudu.client.RowResultIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +44,11 @@ public class Metrics {
     this.tagsets = tagsets;
   }
 
-  public Insert insertDatapoint(final String metric,
+  public Upsert insertDatapoint(final String metric,
                                 final int tagsetID,
                                 final long time,
                                 final double value) {
-    Insert insert = table.newInsert();
+    Upsert insert = table.newUpsert();
     insert.getRow().addString(Tables.METRICS_METRIC_INDEX, metric);
     insert.getRow().addInt(Tables.METRICS_TAGSET_ID_INDEX, tagsetID);
     insert.getRow().addLong(Tables.METRICS_TIME_INDEX, time);
