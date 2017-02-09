@@ -178,12 +178,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <repositories>
-    <repository>
-      <id>cdh.repo</id>
-      <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
-      <name>Cloudera Repositories</name>
-    </repository>
-  </repositories>
 </project>
