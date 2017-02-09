@@ -10,13 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.kududb.Schema;
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.annotations.InterfaceStability;
-import org.kududb.client.AsyncKuduClient;
-import org.kududb.client.CreateTableOptions;
-import org.kududb.client.KuduTable;
-import org.kududb.client.MasterErrorException;
+import org.apache.kudu.Schema;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceStability;
+import org.apache.kudu.client.AsyncKuduClient;
+import org.apache.kudu.client.CreateTableOptions;
+import org.apache.kudu.client.KuduTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,12 +117,9 @@ public class KuduTS implements AutoCloseable {
     class CreateTableErrback implements Callback<Deferred<KuduTable>, Exception> {
       @Override
       public Deferred<KuduTable> call(Exception e) throws Exception {
-        if (e instanceof MasterErrorException) {
-          LOG.debug("Creating table {}", table);
-          return client.createTable(table, schema, options);
-        } else {
-          throw e;
-        }
+        // TODO(danburkert): we should only do this if the error is "not found"
+        LOG.debug("Creating table {}", table);
+        return client.createTable(table, schema, options);
       }
       @Override
       public String toString() {

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.junit.Test;
-import org.kududb.client.BaseKuduTest;
+import org.apache.kudu.client.BaseKuduTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

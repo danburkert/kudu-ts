@@ -25,18 +25,19 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.client.AbstractionBulldozer;
-import org.kududb.client.AsyncKuduClient;
-import org.kududb.client.AsyncKuduScanner;
-import org.kududb.client.AsyncKuduSession;
-import org.kududb.client.Insert;
-import org.kududb.client.KuduPredicate;
-import org.kududb.client.KuduPredicate.ComparisonOp;
-import org.kududb.client.KuduTable;
-import org.kududb.client.OperationResponse;
-import org.kududb.client.RowResult;
-import org.kududb.client.RowResultIterator;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.client.AbstractionBulldozer;
+import org.apache.kudu.client.AsyncKuduClient;
+import org.apache.kudu.client.AsyncKuduScanner;
+import org.apache.kudu.client.AsyncKuduSession;
+import org.apache.kudu.client.Insert;
+import org.apache.kudu.client.KuduException;
+import org.apache.kudu.client.KuduPredicate;
+import org.apache.kudu.client.KuduPredicate.ComparisonOp;
+import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.RowResult;
+import org.apache.kudu.client.RowResultIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +171,7 @@ class Tagsets {
       }
 
       @Override
-      public Deferred<Integer> call(Boolean success) {
+      public Deferred<Integer> call(Boolean success) throws KuduException {
         if (success) {
           return tags.insertTagset(probe, tagset.deserialize());
         } else {
@@ -185,7 +186,7 @@ class Tagsets {
     }
     final class LookupCB implements Callback<Deferred<Integer>, TagsetLookupResult> {
       @Override
-      public Deferred<Integer> call(TagsetLookupResult result) {
+      public Deferred<Integer> call(TagsetLookupResult result) throws KuduException {
         if (result.found) {
           return Deferred.fromResult(result.id);
         } else {
@@ -254,7 +255,7 @@ class Tagsets {
    * @param id     the ID to insert the tagset with
    * @return whether the write succeeded
    */
-  private Deferred<Boolean> insertTagset(final SerializedTagset tagset, final int id) {
+  private Deferred<Boolean> insertTagset(final SerializedTagset tagset, final int id) throws KuduException {
     final class InsertTagsetCB implements Callback<Deferred<Boolean>, OperationResponse> {
       @Override
       public Deferred<Boolean> call(OperationResponse response) {

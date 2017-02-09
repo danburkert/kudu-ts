@@ -24,9 +24,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.kududb.client.RowError;
-import org.kududb.client.RowErrorsAndOverflowStatus;
-import org.kududb.client.SessionConfiguration;
+import org.apache.kudu.client.RowError;
+import org.apache.kudu.client.RowErrorsAndOverflowStatus;
+import org.apache.kudu.client.SessionConfiguration;
 import org.kududb.ts.core.KuduTS;
 import org.kududb.ts.core.WriteBatch;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class PutResource implements Managed {
   public Response put(@QueryParam("summary") @DefaultValue("false") BooleanFlag summary,
                       @QueryParam("details") @DefaultValue("false") BooleanFlag details,
                       @QueryParam("sync") @DefaultValue("false") BooleanFlag sync,
-                      @QueryParam("sync_timeout") @DefaultValue("0") IntParam sync_timeout,
+                      @QueryParam("sync_timeout") @DefaultValue("120000") IntParam sync_timeout,
                       JsonNode body) throws Exception {
     LOG.trace("put; summary: {}, details: {}, sync: {}, sync_timeout: {}, body: {}",
               summary, details, sync, sync_timeout, body);
@@ -94,7 +94,8 @@ public class PutResource implements Managed {
       batch.flush();
       RowErrorsAndOverflowStatus batchErrors = batch.getPendingErrors();
       for (RowError rowError : batchErrors.getRowErrors()) {
-        errors.add(new Error(null, rowError.getErrorStatus().toString()));
+        errors.add(new Error(null, rowError.getErrorStatus().toString()
+         + " (op " + rowError.getOperation().toString() + ")"));
       }
 
       if (errors.isEmpty()) {

@@ -6,8 +6,8 @@ import com.google.common.base.Preconditions;
 import java.util.Map;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
-import org.kududb.annotations.InterfaceStability;
+import org.apache.kudu.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceStability;
 import org.kududb.ts.core.Interpolators.Interpolator;
 
 @InterfaceAudience.Public

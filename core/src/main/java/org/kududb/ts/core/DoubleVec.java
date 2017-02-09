@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.kududb.annotations.InterfaceAudience;
+import org.apache.kudu.annotations.InterfaceAudience;
 
 /*
  * DO NOT EDIT

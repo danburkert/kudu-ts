@@ -10,7 +10,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.junit.Test;
-import org.kududb.client.BaseKuduTest;
+import org.apache.kudu.client.BaseKuduTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
